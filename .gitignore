@@ -1,0 +1,24 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Test outputs
+test_plan.md
+test_design.md
+test_cases.md
+test_cases/
+
+# Node modules (if added in the future)
+node_modules/
+package-lock.json
+
+# Logs
+*.log

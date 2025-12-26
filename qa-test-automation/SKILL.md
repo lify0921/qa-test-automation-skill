@@ -9,9 +9,18 @@ description: 仕様書とソースコードを解析して、テスト計画、�
 
 ## 機能
 
+### 基本機能
+
 1. **テスト計画生成**: 目的、スコープ、リソース、スケジュールを含むテスト計画書を作成
 2. **テスト設計生成**: テスト観点と確認項目を含むテスト設計書を作成
 3. **テストケース生成**: 具体的な手順、データ、期待値を含むテストケースを作成
+
+### 高度な機能（差分分析とリスクベーステスト）
+
+4. **コード差分分析**: Git diffを使って変更箇所を自動検出し、変更の影響範囲を分析
+5. **リスク評価**: 変更内容に基づいて自動的にリスクレベルを判定（Critical/High/Medium/Low）
+6. **リスクベーステスト**: 高リスクの変更に対して重点的なテストを実施
+7. **仕様書との照合**: 変更が仕様書の要件と一致しているかを確認
 
 ## 使用方法
 
@@ -121,6 +130,51 @@ project/
 - `test_cases/TC001_GET_users.md`
 - `test_cases/TC002_POST_users.md`
 - `test_cases/TC003_エラーハンドリング.md`
+
+### 例3: 差分分析とリスクベーステスト（新機能）
+
+**シナリオ:** feature/add-auth ブランチで認証機能を追加した後、mainブランチとの差分を分析してテストを生成
+
+**入力:**
+- 仕様書: `specs/auth_spec.md`
+- ソースコード: `src/auth/`
+- 差分: `git diff main...feature/add-auth`
+
+**実行:**
+```
+/qa-test-automation
+
+インプット情報：
+- 仕様書: specs/auth_spec.md
+- ソースコード: src/auth/
+- Git差分を分析： main...feature/add-auth ブランチの差分を確認して、リスクベーステストを実施
+```
+
+**プロセス:**
+1. Git diffで変更ファイルを検出:
+   - `src/auth/login.js` (新規追加 - Critical Risk)
+   - `src/middleware/auth.js` (新規追加 - Critical Risk)
+   - `src/routes/api.js` (修正 - Medium Risk)
+
+2. リスク評価:
+   - Critical: 認証ロジックの追加（login.js, auth.js）
+   - Medium: APIルート変更（api.js）
+
+3. 仕様書との照合:
+   - login.js: 仕様書の認証要件と一致 ✓
+   - auth.js: トークン検証の実装を確認 ✓
+   - api.js: 保護されたエンドポイントの定義 ✓
+
+**出力:**
+- `test_plan.md`: リスク評価に基づいた工数見積（Critical: 16時間、Medium: 4時間）
+- `test_design.md`:
+  - セクション2に差分分析とリスク評価の詳細
+  - Critical Riskの変更に対する包括的なテスト観点
+- `test_cases/`:
+  - TC001_認証バイパステスト.md（Critical - 最優先）
+  - TC002_トークン有効性検証.md（Critical - 最優先）
+  - TC003_セッション管理.md（Critical - 最優先）
+  - TC004_APIルート保護.md（Medium - 標準）
 
 ## カスタマイズ
 

@@ -113,6 +113,42 @@ What skills are available?
 
 `qa-test-automation` が表示されればインストール成功！
 
+#### ステップ4（オプション）: GitHub MCP Serverのセットアップ
+
+リモートGitHubリポジトリからソースコードを読み取りたい場合のみ必要です。
+
+**GitHub Personal Access Tokenの取得:**
+1. GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)
+2. "Generate new token" をクリック
+3. `repo` にチェックを入れて生成
+4. トークンをコピー
+
+**MCP Serverのインストール:**
+```bash
+# トークンを環境変数に設定
+export GITHUB_PERSONAL_ACCESS_TOKEN="your_github_token_here"
+
+# GitHub MCP Serverを追加
+claude mcp add --transport stdio github \
+  --env GITHUB_PERSONAL_ACCESS_TOKEN="${GITHUB_PERSONAL_ACCESS_TOKEN}" \
+  -- npx @modelcontextprotocol/server-github
+
+# 確認
+claude mcp list
+# github: npx @modelcontextprotocol/server-github - ✓ Connected
+```
+
+**環境変数の永続化（推奨）:**
+```bash
+# Zshの場合
+echo 'export GITHUB_PERSONAL_ACCESS_TOKEN="your_github_token_here"' >> ~/.zshrc
+source ~/.zshrc
+
+# Bashの場合
+echo 'export GITHUB_PERSONAL_ACCESS_TOKEN="your_github_token_here"' >> ~/.bashrc
+source ~/.bashrc
+```
+
 ### 方法2: ZIPファイルからインストール
 
 #### ステップ1: ZIPファイルを解凍

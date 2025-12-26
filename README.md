@@ -13,7 +13,7 @@ Claude Code用のQAテスト自動化スキル。仕様書とソースコード�
 ### 1. リポジトリのクローン
 
 ```bash
-git clone <your-repository-url> qa-test-automation-skill
+git clone https://github.com/lify0921/qa-test-automation-skill.git
 ```
 
 ### 2. スキルのインストール
@@ -49,6 +49,73 @@ What skills are available?
 
 `qa-test-automation` が表示されればインストール成功です。
 
+## GitHub MCP Serverのセットアップ（オプション）
+
+リモートGitHubリポジトリからソースコードを読み取りたい場合、GitHub MCP Serverの設定が必要です。
+
+### 前提条件
+
+GitHub Personal Access Token (PAT) を取得してください：
+
+1. GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)
+2. "Generate new token" をクリック
+3. `repo` にチェックを入れて生成
+4. トークンをコピー（後で使用）
+
+### MCP Serverのインストール
+
+```bash
+# GitHub Personal Access Tokenを環境変数に設定
+export GITHUB_PERSONAL_ACCESS_TOKEN="your_github_token_here"
+
+# GitHub MCP Serverを追加
+claude mcp add --transport stdio github \
+  --env GITHUB_PERSONAL_ACCESS_TOKEN="${GITHUB_PERSONAL_ACCESS_TOKEN}" \
+  -- npx @modelcontextprotocol/server-github
+```
+
+### インストール確認
+
+```bash
+# MCPサーバーの一覧を確認
+claude mcp list
+
+# 以下のような出力が表示されればOK:
+# github: npx @modelcontextprotocol/server-github - ✓ Connected
+```
+
+### 環境変数の永続化（推奨）
+
+毎回トークンを設定しなくて済むよう、シェルの設定ファイルに追加：
+
+**Bash (.bashrc または .bash_profile):**
+```bash
+echo 'export GITHUB_PERSONAL_ACCESS_TOKEN="your_github_token_here"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+**Zsh (.zshrc):**
+```bash
+echo 'export GITHUB_PERSONAL_ACCESS_TOKEN="your_github_token_here"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+### トラブルシューティング
+
+**Q: MCPサーバーが接続できない**
+
+A: トークンが正しく設定されているか確認：
+```bash
+echo $GITHUB_PERSONAL_ACCESS_TOKEN
+```
+
+**Q: MCPサーバーを削除したい**
+
+A: 以下のコマンドで削除：
+```bash
+claude mcp remove github -s local
+```
+
 ## 使用方法
 
 ### 基本的な使い方
@@ -65,7 +132,27 @@ What skills are available?
 
 ### 実行例
 
-#### 例1: API仕様書とソースコードから生成
+#### 例1: ローカルファイルから生成（最も簡単）
+
+```
+/qa-test-automation
+
+インプット情報：
+- 仕様書: docs/specification.md
+- ソースコード: src/services/auth.js
+```
+
+#### 例2: Web上の仕様書とローカルコードから生成
+
+```
+/qa-test-automation
+
+インプット情報：
+- fetch でAPI仕様書を読み込んで： https://example.com/api/spec.yaml
+- ソースコード: src/api/users.js
+```
+
+#### 例3: GitHubリポジトリから生成（GitHub MCP必須）
 
 ```
 /qa-test-automation
@@ -75,15 +162,7 @@ What skills are available?
 - GitHub MCP でソースコードを読み取って： リポジトリ user/repo の src/api/users.js
 ```
 
-#### 例2: ローカルファイルから生成
-
-```
-/qa-test-automation
-
-インプット情報：
-- 仕様書: docs/specification.md
-- ソースコード: src/services/auth.js
-```
+**注意**: 例3を使用する場合は、事前に「GitHub MCP Serverのセットアップ」を完了してください。
 
 ## 生成される成果物
 
@@ -145,9 +224,13 @@ code .claude/skills/qa-test-automation/templates/test_case_template.md
 
 ## システム要件
 
+### 必須
 - Claude Code CLI
-- Node.js 18以上（推奨）
 - Git（リポジトリのクローン用）
+
+### オプション
+- **GitHub MCP Server**（リモートリポジトリからソースコードを読み取る場合）
+- Node.js 18以上（推奨）
 
 ## 対応している入力形式
 
